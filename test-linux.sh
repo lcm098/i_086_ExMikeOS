@@ -3,5 +3,5 @@
 # This script starts the QEMU PC emulator, booting from the
 # MikeOS floppy disk image
 
-qemu-system-i386 -soundhw pcspk -fda disk_images/mikeos.flp
+qemu-system-x86_64 -fda disk_images/mikeos.flp -display gtk,zoom-to-fit=on
 
