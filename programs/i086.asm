@@ -10,6 +10,9 @@ start:
     ; Set background and text color
     call clear_screen
 
+    ; Draw the border
+    call draw_border
+
     ; Set cursor position
     mov ah, 0x02
     mov bh, 0x00    ; Page number
@@ -21,8 +24,9 @@ start:
 
     ; Main loop
 main_loop:
+    
     ; Print prompt message
-    call os_print_newline
+    call console_new_line
     mov si, prompt_msg
     call os_print_string
 
@@ -30,11 +34,12 @@ main_loop:
     mov ax, input_buffer
     mov bx, 1024
     call os_input_string
-    call os_print_newline
+    call console_new_line
 
     ; Print input buffer (echo the user's input)
     mov si, input_buffer  
     call os_print_string  ; Print what the user typed
+
 
     ; Clear the input buffer for the next input
     mov di, input_buffer
@@ -55,6 +60,68 @@ clear_screen:
     mov cx, 0x0000  ; Top-left corner
     mov dx, 0x184F  ; Bottom-right corner
     int 0x10
+    ret
+
+; Draw border around the screen
+draw_border:
+    ; Set color attribute for yellow text (0x0E)
+    mov ah, 0x09
+    mov bh, 0x00    ; Page number
+    mov bl, 0x0E    ; Yellow text
+    mov cx, 1       ; Number of times to write character
+
+    ; Draw top border
+    mov dh, 0       ; Row 0
+    mov dl, 0       ; Column 0
+.top_loop:
+    mov ah, 0x02    ; Set cursor position
+    int 0x10
+    mov al, '#'     ; Character to write
+    mov ah, 0x09    ; Write character with attribute
+    int 0x10
+    inc dl          ; Move to next column
+    cmp dl, 80      ; Check if we reached the end of the row
+    jl .top_loop
+
+    ; Draw bottom border
+    mov dh, 24      ; Row 24
+    mov dl, 0       ; Column 0
+.bottom_loop:
+    mov ah, 0x02    ; Set cursor position
+    int 0x10
+    mov al, '#'     ; Character to write
+    mov ah, 0x09    ; Write character with attribute
+    int 0x10
+    inc dl          ; Move to next column
+    cmp dl, 80      ; Check if we reached the end of the row
+    jl .bottom_loop
+
+    ; Draw left border
+    mov dh, 1       ; Row 1
+    mov dl, 0       ; Column 0
+.left_loop:
+    mov ah, 0x02    ; Set cursor position
+    int 0x10
+    mov al, '#'     ; Character to write
+    mov ah, 0x09    ; Write character with attribute
+    int 0x10
+    inc dh          ; Move to next row
+    cmp dh, 24      ; Check if we reached the bottom of the screen
+    jl .left_loop
+
+    ; Draw right border
+    mov dh, 1       ; Row 1
+    mov dl, 79      ; Column 79
+.right_loop:
+    mov ah, 0x02    ; Set cursor position
+    int 0x10
+    mov al, '#'     ; Character to write
+    mov ah, 0x09    ; Write character with attribute
+    int 0x10
+    inc dh          ; Move to next row
+    cmp dh, 24      ; Check if we reached the bottom of the screen
+    jl .right_loop
+
     ret
 
 ; Check if the screen has scrolled and clear it if necessary
@@ -80,6 +147,23 @@ check_screen_scroll:
 
 .done:
     ret
+
+console_new_line:
+    ; Get current cursor position
+    mov ah, 0x03    ; BIOS function to get cursor position
+    mov bh, 0x00    ; Page number (0 for default)
+    int 0x10        ; Returns cursor position in DH=row, DL=column
+
+    ; Move to the next line
+    inc dh          ; Increment row (move to the next line)
+    mov dl, 1       ; Set column to 1 (indent by one space from the left border)
+
+    ; Set new cursor position
+    mov ah, 0x02    ; BIOS function to set cursor position
+    mov bh, 0x00    ; Page number (0 for default)
+    int 0x10        ; Set cursor position
+
+    ret             ; Return from the function
 
 ; Data Section
 prompt_msg  db '[current dir] -> [/] ', 0
