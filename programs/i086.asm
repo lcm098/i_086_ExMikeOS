@@ -21,9 +21,9 @@ start:
     int 0x10
     mov si, welcome_msg
     call os_print_string
-    
 
-    ; Main loop
+
+; Main loop
 main_loop:
     
     ; Print prompt message
@@ -47,20 +47,20 @@ main_loop:
     ; Print input buffer (echo the user's input)
     mov si, input_buffer  
     call string_split
+    mov si, word [array_buffer_ptr] ; Load the pointer to the first substring
     
-    mov si, word [array_buffer_ptr] ; Load the pointer to the first substring
-    call os_print_string
-    call console_new_line
-
-    mov si, word [array_buffer_ptr] ; Load the pointer to the first substring
-    call skip_to_next_element
-    call os_print_string
-    call console_new_line
-
-    mov si, word [array_buffer_ptr] ; Load the pointer to the first substring
-    call skip_to_next_element
-    call skip_to_next_element
-    call os_print_string
+    .loop:
+        call os_print_string
+        call console_new_line
+        call skip_to_next_element
+        cmp word [array_buffer_count], 0
+        jz .done
+        dec word [array_buffer_count]
+        jmp .loop
+    
+    .done:
+        call main_loop
+        
 
     ; Clear the input buffer for the next input
     mov di, input_buffer
@@ -243,7 +243,6 @@ string_split:
     ; Return the array buffer
     mov word [array_buffer_ptr], array_buffer ; Store the buffer pointer (16-bit)
     mov word [array_buffer_count], bx         ; Store the word count (16-bit)
-
     popa                 ; Restore all registers
     ret                  ; Return from the function
 

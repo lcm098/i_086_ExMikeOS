@@ -109,7 +109,7 @@ os_main:
 
 ; ------------------------------------------------------------------
 ;; Load 16bit Fat File System
-call fs_init
+; call fs_init
 ; ------------------------------------------------------------------
 
 cli				; Clear interrupts
@@ -238,7 +238,7 @@ fmt_date	db 0, '/'	; 0, 1, 2 = M/D/Y, D/M/Y or Y/M/D
 %INCLUDE "features/sound.asm"
 %INCLUDE "features/string.asm"
 %INCLUDE "features/basic.asm"
-%include "FileSystem/fat_fs_16bit.asm"
+; %include "FileSystem/fat_fs_16bit.asm"
 
 
 ; ------------------------------------------------------------------

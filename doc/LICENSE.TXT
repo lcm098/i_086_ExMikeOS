@@ -1,9 +1,9 @@
 ==================================================================
-MikeOS -- License
+ExMikeOS -- License
 ==================================================================
 
 
-Copyright (C) 2006 - 2014 MikeOS Developers -- http://mikeos.sourceforge.net
+Copyright (C) 2006 - 2014 ExMikeOS Developers 
 
 All rights reserved.
 
@@ -17,7 +17,7 @@ modification, are permitted provided that the following conditions are met:
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
 
-    * Neither the name MikeOS nor the names of any MikeOS contributors
+    * Neither the name ExMikeOS nor the names of any ExMikeOS contributors
       may be used to endorse or promote products derived from this software
       without specific prior written permission.
 
