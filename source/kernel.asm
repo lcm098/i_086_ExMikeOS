@@ -102,7 +102,7 @@ os_call_vectors:
 	jmp os_port_byte_out		; 00C9h
 	jmp os_port_byte_in		; 00CCh
 	jmp os_string_tokenize		; 00CFh
-	jmp os_string_split ; 0124h
+	; jmp os_string_split ; 0124h
 
 
 ; ------------------------------------------------------------------

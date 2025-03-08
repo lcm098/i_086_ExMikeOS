@@ -5,57 +5,62 @@
 ; STRING MANIPULATION ROUTINES
 ; ==================================================================
 
-os_string_split:
-    push bp
-    mov bp, sp
-    push si
-    push di
-    push bx
-    push cx
-    push dx
-    
-    xor ax, ax      ; Clear AX (argument count)
-    mov cx, 0       ; CX will count arguments
-    
-.next_arg:
-    ; Skip leading spaces
-    mov dl, [si]
-    cmp dl, 0
-    je .done         ; If end of string, finish
-    cmp dl, ' '
-    jne .found_arg
-    inc si
-    jmp .next_arg
-    
-.found_arg:
-    ; Store argument pointer
-    mov [di], si
-    add di, 2        ; Move to next entry in arg_array
-    inc cx           ; Increment argument count
-    
-.scan_word:
-    mov dl, [si]
-    cmp dl, 0
-    je .done         ; If end of string, finish
-    cmp dl, ' '
-    je .terminate_arg
-    inc si
-    jmp .scan_word
-    
-.terminate_arg:
-    mov byte [si], 0 ; Replace space with null terminator
-    inc si           ; Move to next character
-    jmp .next_arg
-    
-.done:
-    mov ax, cx       ; Store argument count in AX
-    pop dx
-    pop cx
-    pop bx
-    pop di
-    pop si
-    pop bp
-    ret
+; os_string_split:
+;     pusha                ; Save all registers
+;     mov ah, 0x0E         ; BIOS interrupt, function 0x0E (print character)
+;     mov di, array_buffer ; DI points to the array buffer
+;     mov bx, 0            ; BX will track the current position in the array buffer
+
+; .loop:
+;     lodsb                ; Load the byte at address DS:SI into AL
+;     test al, al          ; Check if AL is zero (end of string)
+;     jz .done             ; If AL is zero, we are done
+
+;     cmp al, ' '          ; Check if AL is a space
+;     je .space            ; If AL is a space, handle it
+
+;     cmp al, '"'          ; Check if AL is a double quote
+;     je .quote            ; If AL is a double quote, handle it
+
+;     ; Store the character in the current word buffer
+;     stosb                ; Store AL at ES:DI and increment DI
+;     jmp .loop            ; Continue processing the string
+
+; .space:
+;     ; End of a word, store a null terminator
+;     mov byte [di], 0     ; Null-terminate the current word
+;     inc di               ; Move DI to the next position in the array buffer
+;     inc bx               ; Increment the word count
+;     jmp .loop            ; Continue processing the string
+
+; .quote:
+;     ; Handle text between double quotes
+;     lodsb                ; Load the next character
+;     cmp al, '"'          ; Check if AL is a closing double quote
+;     je .quote_end        ; If AL is a closing double quote, end the quoted text
+
+;     ; Store the character in the current word buffer
+;     stosb                ; Store AL at ES:DI and increment DI
+;     jmp .quote           ; Continue processing the quoted text
+
+; .quote_end:
+;     ; End of quoted text, store a null terminator
+;     mov byte [di], 0     ; Null-terminate the current word
+;     inc di               ; Move DI to the next position in the array buffer
+;     inc bx               ; Increment the word count
+;     jmp .loop            ; Continue processing the string
+
+; .done:
+;     ; End of the string, store a null terminator for the last word
+;     mov byte [di], 0     ; Null-terminate the last word
+;     inc bx               ; Increment the word count
+
+;     ; Return the array buffer
+;     mov word [array_buffer_ptr], array_buffer ; Store the buffer pointer (16-bit)
+;     mov word [array_buffer_count], bx         ; Store the word count (16-bit)
+
+;     popa                 ; Restore all registers
+;     ret                  ; Return from the function
 
 
 ; ------------------------------------------------------------------
@@ -1102,3 +1107,7 @@ os_string_tokenize:
 
 ; ==================================================================
 
+; ; Data
+; array_buffer times 256 db 0 ; Buffer to store the array of substrings
+; array_buffer_ptr dw 0       ; Pointer to the array buffer
+; array_buffer_count dw 0     ; Number of substrings in the array

@@ -38,8 +38,22 @@ main_loop:
 
     ; Print input buffer (echo the user's input)
     mov si, input_buffer  
-    call os_print_string  ; Print what the user typed
+    call string_split
+    
+    mov si, word [array_buffer_ptr] ; Load the pointer to the first substring
+    call os_print_string
+    call console_new_line
 
+    mov si, word [array_buffer_ptr] ; Load the pointer to the first substring
+    call skip_to_next_element
+    call os_print_string
+
+    call console_new_line
+
+    mov si, word [array_buffer_ptr] ; Load the pointer to the first substring
+    call skip_to_next_element
+    call skip_to_next_element
+    call os_print_string
 
     ; Clear the input buffer for the next input
     mov di, input_buffer
@@ -165,10 +179,80 @@ console_new_line:
 
     ret             ; Return from the function
 
+
+string_split:
+    pusha                ; Save all registers
+    mov ah, 0x0E         ; BIOS interrupt, function 0x0E (print character)
+    mov di, array_buffer ; DI points to the array buffer
+    mov bx, 0            ; BX will track the current position in the array buffer
+
+.loop:
+    lodsb                ; Load the byte at address DS:SI into AL
+    test al, al          ; Check if AL is zero (end of string)
+    jz .done             ; If AL is zero, we are done
+
+    cmp al, ' '          ; Check if AL is a space
+    je .space            ; If AL is a space, handle it
+
+    cmp al, '"'          ; Check if AL is a double quote
+    je .quote            ; If AL is a double quote, handle it
+
+    ; Store the character in the current word buffer
+    stosb                ; Store AL at ES:DI and increment DI
+    jmp .loop            ; Continue processing the string
+
+.space:
+    ; End of a word, store a null terminator
+    mov byte [di], 0     ; Null-terminate the current word
+    inc di               ; Move DI to the next position in the array buffer
+    inc bx               ; Increment the word count
+    jmp .loop            ; Continue processing the string
+
+.quote:
+    ; Handle text between double quotes
+    lodsb                ; Load the next character
+    cmp al, '"'          ; Check if AL is a closing double quote
+    je .quote_end        ; If AL is a closing double quote, end the quoted text
+
+    ; Store the character in the current word buffer
+    stosb                ; Store AL at ES:DI and increment DI
+    jmp .quote           ; Continue processing the quoted text
+
+.quote_end:
+    ; End of quoted text, store a null terminator
+    mov byte [di], 0     ; Null-terminate the current word
+    inc di               ; Move DI to the next position in the array buffer
+    inc bx               ; Increment the word count
+    jmp .loop            ; Continue processing the string
+
+.done:
+    ; End of the string, store a null terminator for the last word
+    mov byte [di], 0     ; Null-terminate the last word
+    inc bx               ; Increment the word count
+
+    ; Return the array buffer
+    mov word [array_buffer_ptr], array_buffer ; Store the buffer pointer (16-bit)
+    mov word [array_buffer_count], bx         ; Store the word count (16-bit)
+
+    popa                 ; Restore all registers
+    ret                  ; Return from the function
+
+skip_to_next_element:
+    .skip_loop:
+        lodsb                   ; Load the byte at address DS:SI into AL
+        test al, al             ; Check if AL is zero (end of substring)
+        jnz .skip_loop          ; If not zero, continue skipping
+    ret
+
 ; Data Section
 prompt_msg  db '[current dir] -> [/] ', 0
 input_buffer times 1024 db 0
 welcome_msg db 'ExTerminal [ExMikeOs, ExTerminal v=2025]', 0
+
+; Data
+array_buffer times 256 db 0 ; Buffer to store the array of substrings
+array_buffer_ptr dw 0       ; Pointer to the array buffer
+array_buffer_count dw 0     ; Number of substrings in the array
 
 ; Boot sector padding (if needed)
 ; times 510-($-$$) db 0

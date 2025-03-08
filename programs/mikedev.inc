@@ -157,7 +157,6 @@ os_create_multiple_files equ 00D2h
 
 ; String Operations
 
-
 os_string_concat              equ 0106h  ; Concatenate two strings
 os_string_find_substring      equ 010Ch  ; Find substring within string
 os_string_find_char           equ 010Fh  ; Find character in string
@@ -166,7 +165,7 @@ os_string_replace_substring   equ 0115h  ; Replace substring in string
 os_string_to_uppercase        equ 0118h  ; Convert string to uppercase
 os_string_to_lowercase        equ 011Bh  ; Convert string to lowercase
 os_string_trim_whitespace     equ 0121h  ; Remove whitespace from string
-os_string_split               equ 0124h  ; Split string by delimiter
+; os_string_split               equ 0124h  ; Split string by delimiter
 os_string_insert              equ 012Ah  ; Insert substring into string
 os_string_delete              equ 012Dh  ; Delete portion of string
 os_string_pad_left            equ 0130h  ; Pad string from left
