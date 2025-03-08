@@ -5,7 +5,6 @@
 ; STRING MANIPULATION ROUTINES
 ; ==================================================================
 
-
 ; ------------------------------------------------------------------
 ; os_string_length -- Return length of a string
 ; IN: AX = string location

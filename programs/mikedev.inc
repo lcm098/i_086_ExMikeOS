@@ -157,6 +157,7 @@ os_create_multiple_files equ 00D2h
 
 ; String Operations
 
+os_string_shell_split		  equ 0100h  ; Split string into parts
 os_string_concat              equ 0106h  ; Concatenate two strings
 os_string_find_substring      equ 010Ch  ; Find substring within string
 os_string_find_char           equ 010Fh  ; Find character in string

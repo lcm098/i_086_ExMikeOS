@@ -21,6 +21,7 @@ start:
     int 0x10
     mov si, welcome_msg
     call os_print_string
+    
 
     ; Main loop
 main_loop:
@@ -263,7 +264,3 @@ welcome_msg db 'ExTerminal [ExMikeOs, ExTerminal v=2025]', 0
 array_buffer times 256 db 0 ; Buffer to store the array of substrings
 array_buffer_ptr dw 0       ; Pointer to the array buffer
 array_buffer_count dw 0     ; Number of substrings in the array
-
-; Boot sector padding (if needed)
-; times 510-($-$$) db 0
-; dw 0xAA55
