@@ -5,63 +5,6 @@
 ; STRING MANIPULATION ROUTINES
 ; ==================================================================
 
-; os_string_split:
-;     pusha                ; Save all registers
-;     mov ah, 0x0E         ; BIOS interrupt, function 0x0E (print character)
-;     mov di, array_buffer ; DI points to the array buffer
-;     mov bx, 0            ; BX will track the current position in the array buffer
-
-; .loop:
-;     lodsb                ; Load the byte at address DS:SI into AL
-;     test al, al          ; Check if AL is zero (end of string)
-;     jz .done             ; If AL is zero, we are done
-
-;     cmp al, ' '          ; Check if AL is a space
-;     je .space            ; If AL is a space, handle it
-
-;     cmp al, '"'          ; Check if AL is a double quote
-;     je .quote            ; If AL is a double quote, handle it
-
-;     ; Store the character in the current word buffer
-;     stosb                ; Store AL at ES:DI and increment DI
-;     jmp .loop            ; Continue processing the string
-
-; .space:
-;     ; End of a word, store a null terminator
-;     mov byte [di], 0     ; Null-terminate the current word
-;     inc di               ; Move DI to the next position in the array buffer
-;     inc bx               ; Increment the word count
-;     jmp .loop            ; Continue processing the string
-
-; .quote:
-;     ; Handle text between double quotes
-;     lodsb                ; Load the next character
-;     cmp al, '"'          ; Check if AL is a closing double quote
-;     je .quote_end        ; If AL is a closing double quote, end the quoted text
-
-;     ; Store the character in the current word buffer
-;     stosb                ; Store AL at ES:DI and increment DI
-;     jmp .quote           ; Continue processing the quoted text
-
-; .quote_end:
-;     ; End of quoted text, store a null terminator
-;     mov byte [di], 0     ; Null-terminate the current word
-;     inc di               ; Move DI to the next position in the array buffer
-;     inc bx               ; Increment the word count
-;     jmp .loop            ; Continue processing the string
-
-; .done:
-;     ; End of the string, store a null terminator for the last word
-;     mov byte [di], 0     ; Null-terminate the last word
-;     inc bx               ; Increment the word count
-
-;     ; Return the array buffer
-;     mov word [array_buffer_ptr], array_buffer ; Store the buffer pointer (16-bit)
-;     mov word [array_buffer_count], bx         ; Store the word count (16-bit)
-
-;     popa                 ; Restore all registers
-;     ret                  ; Return from the function
-
 
 ; ------------------------------------------------------------------
 ; os_string_length -- Return length of a string
@@ -1106,8 +1049,3 @@ os_string_tokenize:
 
 
 ; ==================================================================
-
-; ; Data
-; array_buffer times 256 db 0 ; Buffer to store the array of substrings
-; array_buffer_ptr dw 0       ; Pointer to the array buffer
-; array_buffer_count dw 0     ; Number of substrings in the array

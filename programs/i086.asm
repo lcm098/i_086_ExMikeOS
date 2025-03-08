@@ -30,11 +30,18 @@ main_loop:
     mov si, prompt_msg
     call os_print_string
 
+    ; Check if Esc was pressed (assuming os_input_string sets carry flag on Esc)
+    mov ah, 0x00
+    int 0x16
+    cmp al, 0x1B   ; Check if AL = 27 (Escape key)
+    je escape_pressed
+
     ; Get user input
     mov ax, input_buffer
     mov bx, 1024
     call os_input_string
     call console_new_line
+    
 
     ; Print input buffer (echo the user's input)
     mov si, input_buffer  
@@ -47,7 +54,6 @@ main_loop:
     mov si, word [array_buffer_ptr] ; Load the pointer to the first substring
     call skip_to_next_element
     call os_print_string
-
     call console_new_line
 
     mov si, word [array_buffer_ptr] ; Load the pointer to the first substring
@@ -63,8 +69,11 @@ main_loop:
 
     ; Check if the screen needs to be cleared (e.g., after scrolling)
     call check_screen_scroll
-
     jmp main_loop
+    
+escape_pressed:
+	call os_clear_screen
+	ret
 
 ; Clear screen and set background color
 clear_screen:
@@ -242,6 +251,7 @@ skip_to_next_element:
         lodsb                   ; Load the byte at address DS:SI into AL
         test al, al             ; Check if AL is zero (end of substring)
         jnz .skip_loop          ; If not zero, continue skipping
+        inc si                  ; Skip the null terminator
     ret
 
 ; Data Section
